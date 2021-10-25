@@ -48,7 +48,12 @@ personality_quiz = Survey(
     ]
 )
 
+# surveys = {
+#     "satisfaction": satisfaction_survey,
+#     "personality": personality_quiz,
+# }
+
 surveys = {
-    "satisfaction": satisfaction_survey,
-    "personality": personality_quiz,
+    "Customer": satisfaction_survey,
+    "Rithm": personality_quiz,
 }

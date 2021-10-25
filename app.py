@@ -1,11 +1,12 @@
-from flask import Flask, request, render_template, redirect, flash, session
+from flask import Flask, session, request, render_template, redirect, make_response, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from surveys import satisfaction_survey as survey
+from surveys import surveys
+
+# from surveys import satisfaction_survey as survey
 
 # key names will use to store some things in the session;
 # put here as constants so we're guaranteed to be consistent in
 # our spelling of these
-# RESPONSES_KEY = "responses"
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "secret_survey"
@@ -16,13 +17,25 @@ debug = DebugToolbarExtension(app)
 # Step Two: The Start Page
 responses = []
 
-# @app.route('/choose_survey')
-# def choose_survey():
-#     return render_template()
-
+# Home Page show the surveys to choose from
 @app.route('/')
 def home_page():
+    return render_template("start_survey.html", surveys=surveys.values())
+
+@app.route('/survey', methods=["POST"])
+def choose_survey():
+    survey_id = request.form["survey_id"]
+    # survey_id = request.args["survey_id"]
+    survey = surveys[survey_id]
+    session['current_survey'] = survey_id
+
     return render_template("base.html", survey=survey)
+    # return render_template('base.html', survey=survey)
+
+
+# @app.route('/')
+# def home_page():
+#     return render_template("base.html", survey=survey)
 
 @app.route('/begin', methods=["POST"])
 def reset():
@@ -34,7 +47,11 @@ def reset():
 #  Step Three: the Question Page -> I don't understand this <int:question_id> where does it come from? 
 @app.route('/questions/<int:question_id>')
 def question_page(question_id):
+
     responses = session.get('responses')
+    # This current_survey is not being recognized... unsure if it's just not being saved 
+    survey_code = session['current_survey']
+    survey = surveys[survey_code]
 
     if (responses is None):
         return redirect('/')
@@ -53,15 +70,16 @@ def question_page(question_id):
 # Step Four: Handling Answers
 @app.route('/answer', methods=["POST"])
 def answer_page():
+    # responses = session.get('responses')
+    # This current_survey is not being recognized... unsure if it's just not being saved 
+    survey_code = session['current_survey']
+    survey = surveys[survey_code]
     # get the response choice
     choice = request.form['answer']
     responses = session['responses']
     responses.append(choice)
     session['responses'] = responses
-    # fruits = session['fruits']
-    # fruits.append("cherry")
-    # session['fruits'] = fruits
-    # responses.append(choice)
+
 
     # Step Five
     if len(responses) == len(survey.questions):

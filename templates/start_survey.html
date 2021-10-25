@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Select a survey!</h1>
-    <form action="/questions">
+    <form action="/survey" method="post">
         <select name = "survey_id">
             {% for survey in surveys %}
                 <option value={{ survey.title }}>
@@ -16,7 +16,7 @@
                 </option>
             {%  endfor %}
         </select>
-        <input type="hidden" name="survey_id" value="{{ survey_id }}">
+        <!-- <input type="hidden" name="survey_id" value="{{ survey_id }}"> -->
         <button>Submit</button>
     </form>
 </body>
